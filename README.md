@@ -56,7 +56,7 @@ namikazi25-ecohack/
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/your-repo/ecobot.git
+   git clone https://github.com/namikazi25/Ecobot.git
    cd ecobot
    ```
 
