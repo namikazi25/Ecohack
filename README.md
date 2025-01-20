@@ -3,6 +3,10 @@
 
 EcoBot is a chatbot built to empower ecological exploration and species identification. It leverages **GPT-4o Mini** for intelligent responses, supports **chat history persistence**, and can **analyze images and PDFs** to provide insights into biodiversity, species traits, and ecological questions.
 
+
+![EcoBot](/screenshot.jpeg "EcoBot Logo")
+
+
 ---
 
 ## 🚀 Features
@@ -141,21 +145,6 @@ namikazi25-ecohack/
 - **API Key Missing**  
   Make sure your `.env` file contains `OPENAI_API_KEY`.
 
----
-
-## 🧪 Testing
-
-- **Run Tests**  
-  From the project root or inside the `tests/` folder, execute:
-
-  ```bash
-  pytest
-  ```
-
-- **Test Coverage**  
-  The test suite in `tests/test_image_classifier.py` checks BioTrove-CLIP model loading and basic classification.
-
----
 
 ## 🌍 Contributing
 
