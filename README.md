@@ -1,12 +1,9 @@
-```markdown
+![EcoBot Logo](screenshot.jpeg)
+
+
 # 🌱 EcoBot: AI-Powered Ecological Assistant
 
 EcoBot is a chatbot built to empower ecological exploration and species identification. It leverages **GPT-4o Mini** for intelligent responses, supports **chat history persistence**, and can **analyze images and PDFs** to provide insights into biodiversity, species traits, and ecological questions.
-
-
-<p align="center">
-  <img src="screenshot.jpeg" alt="EcoBot Logo" width="400">
-</p>
 
 
 ---
@@ -147,18 +144,6 @@ namikazi25-ecohack/
 - **API Key Missing**  
   Make sure your `.env` file contains `OPENAI_API_KEY`.
 
-
-## 🌍 Contributing
-
-We welcome contributions! Feel free to fork the repository, make changes, and submit a pull request. Whether it’s bug fixes, new features, or documentation improvements, all contributions help grow EcoBot’s capabilities.
-
----
-
-## 📜 License
-
-This project is released as open-source. Feel free to use, modify, and distribute it under the terms specified in the repository.
-
----
 
 <p align="center">
   <strong>Thank you for using EcoBot! Together, let's explore and protect our planet's biodiversity. 🌏</strong>
