@@ -1,8 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from pydantic import BaseModel
 from gpt_handler import process_with_gpt4o
-import io
-import json  # ✅ Add this
+import json
 
 app = FastAPI()
 
@@ -13,25 +12,22 @@ class QueryRequest(BaseModel):
 @app.post("/query/")
 async def process_query(
     query: str = Form(...),
-    history: str = Form("[]"),  # ✅ History is received as a string
+    history: str = Form("[]"),  
     file: UploadFile = File(None)
 ):
-    file_content = await file.read() if file else None
-    file_type = file.content_type if file else None
+    file_content = None
+    file_type = None
 
-    # ✅ Convert `history` from JSON string to Python list
-    try:
-        history = json.loads(history)  # Convert JSON string to list
-    except json.JSONDecodeError:
-        history = []  # Default to empty list if parsing fails
-
-    print(f"📩 Received query: {query}")
-    print(f"📜 Chat history: {history}")  # ✅ Now correctly parsed as a list
     if file:
-        print(f"📄 Uploaded file type: {file_type}, size: {len(file_content)} bytes")
+        file_content = await file.read()
+        file_type = file.content_type
+
+    # Convert history from JSON string to list
+    try:
+        history = json.loads(history)
+    except json.JSONDecodeError:
+        history = []
 
     response = process_with_gpt4o(query, history, file_content, file_type)
-
-    print(f"📨 Response sent: {response}")
 
     return response
