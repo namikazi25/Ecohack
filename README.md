@@ -148,4 +148,3 @@ namikazi25-ecohack/
 <p align="center">
   <strong>Thank you for using EcoBot! Together, let's explore and protect our planet's biodiversity. 🌏</strong>
 </p>
-```
