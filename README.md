@@ -1,101 +1,175 @@
 ```markdown
-# 🌿 EcoBot: AI-Powered Ecological Assistant
+# 🌱 EcoBot: AI-Powered Ecological Assistant
 
-EcoBot is an AI-powered chatbot that helps users identify species from images, analyze biodiversity, and answer ecological questions. It supports **chat history persistence** and **image/PDF processing** using GPT-4o Mini.
+EcoBot is a chatbot built to empower ecological exploration and species identification. It leverages **GPT-4o Mini** for intelligent responses, supports **chat history persistence**, and can **analyze images and PDFs** to provide insights into biodiversity, species traits, and ecological questions.
 
 ---
 
 ## 🚀 Features
-✅ **Chatbot interface** with **Streamlit**  
-✅ **Supports file uploads** (images & PDFs) for analysis  
-✅ **Uses GPT-4o Mini** for intelligent ecological responses  
-✅ **Maintains chat history** for contextual conversations  
-✅ **FastAPI backend** to handle queries  
+
+- **Streamlit Frontend**: A simple and intuitive chatbot interface.
+- **FastAPI Backend**: Receives requests, processes files, and interacts with GPT-4o Mini.
+- **File Uploads**: Supports image (JPEG, PNG) and PDF uploads for analysis.
+- **Chat History**: Maintains context across conversations.
+- **BioTrove-CLIP Model**: Zero-shot image classification for species identification.
 
 ---
 
-## 📂 **Project Structure**
+## 📂 Directory Structure
 
-EcoBot/
-│── backend/
-│   ├── main.py               # FastAPI backend
-│   ├── gpt_handler.py         # GPT-4o Mini processing
-│── frontend/
-│   ├── app.py                # Streamlit frontend
-│── tests/                     # Test scripts
-│── .env                       # API key configuration
-│── requirements.txt           # Dependencies
-│── README.md                  # Documentation
+```bash
+namikazi25-ecohack/
+├── README.md              # Project documentation
+├── app.py                 # Streamlit app (front-end)
+├── requirements.txt       # Python dependencies
+├── assests/
+│   └── biotrove-test.avif # Sample asset
+├── backend/
+│   ├── gpt_handler.py     # GPT-4o Mini integration
+│   ├── image_classifier.py# BioTrove-CLIP classification
+│   ├── main.py            # FastAPI server
+│   └── __pycache__/
+├── tests/
+│   ├── test_image_classifier.py
+│   └── __pycache__/
+└── .streamlit/
+    └── config.toml        # Streamlit configuration
+```
 
-
----
-
-## 🛠️ **Setup Instructions**
-
-### **1️⃣ Clone the Repository**
-
-git clone https://github.com/your-repo/ecobot.git
-cd ecobot
-
-
-### **2️⃣ Create a Virtual Environment**
-
-python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
-
-
-### **3️⃣ Install Dependencies**
-
-pip install -r requirements.txt
-
-
-### **4️⃣ Set Up Environment Variables**
-Create a `.env` file in the root folder and add:
-
-OPENAI_API_KEY=your-openai-api-key
-
+1. **`app.py`**  
+   The Streamlit application that provides the chatbot UI.  
+2. **`requirements.txt`**  
+   Includes all Python packages needed to run EcoBot.  
+3. **`backend/`**  
+   - **`main.py`**: Defines the FastAPI endpoints and orchestrates GPT-4o interactions.  
+   - **`gpt_handler.py`**: Core logic for handling queries, PDFs, images, and GPT-4o queries.  
+   - **`image_classifier.py`**: Uses BioTrove-CLIP for image-based species classification.  
+4. **`tests/`**  
+   Contains unit tests for the `image_classifier.py`.  
+5. **`.streamlit/`**  
+   Contains Streamlit configuration files.
 
 ---
 
-## ▶️ **How to Run the App**
-### **1️⃣ Start the FastAPI Backend**
-cd backend
-uvicorn main:app --reload
+## 🛠️ Setup Instructions
 
+1. **Clone the Repository**
 
-### **2️⃣ Start the Streamlit Frontend**
-Open a new terminal and run:
-streamlit run app.py
+   ```bash
+   git clone https://github.com/your-repo/ecobot.git
+   cd ecobot
+   ```
 
+2. **Create a Virtual Environment**
 
----
+   ```bash
+   python -m venv venv
+   # macOS/Linux
+   source venv/bin/activate
+   # Windows
+   venv\Scripts\activate
+   ```
 
-## 📌 **How It Works**
-1️⃣ **User uploads an image or PDF (optional) and types a query**  
-2️⃣ **Streamlit frontend sends request to FastAPI backend**  
-3️⃣ **FastAPI processes the request and passes it to GPT-4o Mini**  
-4️⃣ **GPT-4o Mini analyzes the query, chat history, and uploaded file**  
-5️⃣ **Response is sent back and displayed in the chat UI**  
+3. **Install Dependencies**
 
----
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 🛠️ **Troubleshooting**
-❌ **Getting a "Field required" error?**  
-✅ Make sure `history` is being sent as `json.dumps(history)`.  
+4. **Set Environment Variables**
 
-❌ **Chatbot doesn't remember previous messages?**  
-✅ Ensure `st.session_state.messages` is correctly maintained.  
+   Create a `.env` file in the project root and add your OpenAI API key:
 
-❌ **File uploads not working?**  
-✅ Make sure you're sending files using `files=files` in `requests.post()`.  
-
----
-
-## 📜 **License**
-This project is **open-source**. Feel free to modify and contribute!
+   ```bash
+   OPENAI_API_KEY=your-openai-api-key
+   ```
 
 ---
 
-## 🙌 **Contributing**
-🚀 Want to improve EcoBot? Fork the repo, submit a PR, and let's build together! 🌱
+## ▶️ Usage
+
+1. **Start the FastAPI Backend**
+
+   ```bash
+   cd backend
+   uvicorn main:app --reload
+   ```
+
+   The backend will be accessible at `http://127.0.0.1:8000`.
+
+2. **Run the Streamlit Frontend**
+
+   In a new terminal, navigate to the project root and run:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+   Open the local URL provided in your terminal to access the EcoBot interface.
+
+---
+
+## 🤖 How It Works
+
+1. **User Input**  
+   - You can upload an image or PDF (optional).
+   - Then type your ecological question or request in the chat input.
+
+2. **Request Handling**  
+   - The Streamlit frontend sends your message (and any file) to the FastAPI backend.
+
+3. **GPT-4o Mini Integration**  
+   - The backend calls GPT-4o Mini with the current query, any relevant chat history, and the file content.
+
+4. **Response**  
+   - GPT-4o Mini returns a detailed answer, which is displayed in the chat UI.
+   - Any species classifications are assisted by the BioTrove-CLIP model for image analysis.
+
+---
+
+## 📌 Troubleshooting
+
+- **Field Required Error**  
+  Ensure `history` is sent as `json.dumps(history)` when making requests to the backend.
+
+- **Chatbot Forgets Messages**  
+  Make sure `st.session_state.messages` is properly maintained in `app.py`.
+
+- **File Uploads Not Working**  
+  Verify that files are being sent via `files=files` in your `requests.post()` to the FastAPI endpoint.
+
+- **API Key Missing**  
+  Make sure your `.env` file contains `OPENAI_API_KEY`.
+
+---
+
+## 🧪 Testing
+
+- **Run Tests**  
+  From the project root or inside the `tests/` folder, execute:
+
+  ```bash
+  pytest
+  ```
+
+- **Test Coverage**  
+  The test suite in `tests/test_image_classifier.py` checks BioTrove-CLIP model loading and basic classification.
+
+---
+
+## 🌍 Contributing
+
+We welcome contributions! Feel free to fork the repository, make changes, and submit a pull request. Whether it’s bug fixes, new features, or documentation improvements, all contributions help grow EcoBot’s capabilities.
+
+---
+
+## 📜 License
+
+This project is released as open-source. Feel free to use, modify, and distribute it under the terms specified in the repository.
+
+---
+
+<p align="center">
+  <strong>Thank you for using EcoBot! Together, let's explore and protect our planet's biodiversity. 🌏</strong>
+</p>
+```
