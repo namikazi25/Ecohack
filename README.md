@@ -4,7 +4,9 @@
 EcoBot is a chatbot built to empower ecological exploration and species identification. It leverages **GPT-4o Mini** for intelligent responses, supports **chat history persistence**, and can **analyze images and PDFs** to provide insights into biodiversity, species traits, and ecological questions.
 
 
-![EcoBot](/screenshot.jpeg "EcoBot Logo")
+<p align="center">
+  <img src="screenshot.jpeg" alt="EcoBot Logo" width="400">
+</p>
 
 
 ---
