@@ -83,17 +83,6 @@ if user_input:
     except requests.exceptions.RequestException as e:
         bot_response = f"⚠️ Backend Error: {str(e)}"
         print(f"❌ Request Exception: {str(e)}")  # Debugging output
-    # try:
-    #     response = requests.post(f"{API_URL}/query/", json=data, files=files)
 
-    #     if response.status_code == 200:
-    #         bot_response = response.json().get("response", "No response received.")
-    #     else:
-    #         bot_response = "Error processing request."
-
-    # except requests.exceptions.RequestException as e:
-    #     bot_response = f"⚠️ Backend Error: {str(e)}"
-
-    # Update assistant message
     message_placeholder.markdown(bot_response)
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
