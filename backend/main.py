@@ -48,6 +48,11 @@ async def process_query(
             result = executor.execute(evaluation, chat_history)
             if file and "pdf" in file_type:
                 result["pdf_context"] = evaluation.get("extracted_text", "")
+            # Validate response structure
+            if not result.get("response"):
+                result["response"] = "⚠️ No response generated"
+            if "sources" not in result:
+                result["sources"] = []
             chat_history.append({"role": "assistant", "content": result["response"]})  # Store response
             return result  # Successfully executed
 

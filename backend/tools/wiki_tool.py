@@ -1,15 +1,77 @@
 import requests
-import json
+from typing import Optional, Dict
+import re
 
-WIKIPEDIA_API_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/"
+WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
+WIKIPEDIA_PAGE_BASE = "https://en.wikipedia.org/wiki"  # <-- ADD THIS LINE
 
-def fetch_wikipedia_summary(query: str) -> str:
-    """Fetches a short summary from Wikipedia."""
+
+def search_wikipedia(query: str, sentences: int = 3) -> Optional[Dict]:
+    """Search Wikipedia and return structured data with page validation."""
+    params = {
+        "action": "query",
+        "list": "search",
+        "srsearch": query,
+        "format": "json",
+        "srlimit": 3
+    }
+    
     try:
-        response = requests.get(f"{WIKIPEDIA_API_URL}{query.replace(' ', '_')}")
-        if response.status_code == 200:
-            data = response.json()
-            return data.get("extract", "No summary available.")
-        return f"❌ Wikipedia API Error: {response.status_code}"
+        search_response = requests.get(WIKIPEDIA_API, params=params, timeout=10)
+        search_data = search_response.json()
+        
+        if not search_data.get('query', {}).get('search'):
+            return None
+            
+        best_match = search_data['query']['search'][0]
+        page_id = best_match['pageid']
+        
+        # Get full page content
+        content_params = {
+            "action": "query",
+            "prop": "extracts|info",
+            "pageids": page_id,
+            "exsentences": sentences,
+            "explaintext": True,
+            "inprop": "url",
+            "format": "json"
+        }
+        
+        content_response = requests.get(WIKIPEDIA_API, params=content_params)
+        content_data = content_response.json()
+        page = content_data['query']['pages'][str(page_id)]
+        
+        return {
+            "title": page['title'],
+            "summary": clean_text(page.get('extract', '')),
+            "url": page['fullurl'],
+            "pageid": page_id
+        }
+        
     except Exception as e:
-        return f"❌ Wikipedia fetch error: {str(e)}"
+        print(f"Wikipedia API Error: {str(e)}")
+        return None
+
+def clean_text(text: str) -> str:
+    """Clean Wikipedia text for GPT consumption."""
+    return re.sub(r'\s+', ' ', text).strip()
+
+def fetch_full_page(pageid: int) -> Optional[str]:
+    """Fetch full page content by page ID"""
+    try:
+        params = {
+            "action": "query",
+            "prop": "extracts",
+            "pageids": pageid,
+            "explaintext": True,
+            "format": "json"
+        }
+        response = requests.get(WIKIPEDIA_API, params=params, timeout=15)
+        data = response.json()
+        return {
+            "content": data['query']['pages'][str(pageid)].get('extract', ''),
+            "title": data['query']['pages'][str(pageid)]['title']  # Add title
+        }
+    except Exception as e:
+        print(f"Full page fetch error: {str(e)}")
+        return None
