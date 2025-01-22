@@ -59,7 +59,8 @@ if user_input:
     "history": history,
     "pdf_context": st.session_state.pdf_context  # Send current PDF context
 }
-    
+
+        
     files = None
     if uploaded_file:
         files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
@@ -72,7 +73,11 @@ if user_input:
         bot_response = response.json().get("response", "No response received.")
     except requests.exceptions.RequestException as e:
         bot_response = f"⚠️ Backend Error: {str(e)}"
-
+    
+    # After receiving response:
+    if "pdf_context" in response.json():
+        st.session_state.pdf_context = response.json()["pdf_context"]
+        
     message_placeholder.markdown(bot_response)
     st.session_state.messages.append({"role": "assistant", "content": bot_response})
 

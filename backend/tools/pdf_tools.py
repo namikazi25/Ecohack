@@ -22,7 +22,16 @@ def process_pdf_with_gpt4o(extracted_text: str, query: str) -> str:
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "user", "content": f"{query}\n\nExtracted text:\n{extracted_text}"}
+                {  # Add system message for context
+                    "role": "system",
+                    "content": """You are EcoBot, an AI-powered ecological assistant. 
+                    Provide scientific and informative responses about biodiversity, 
+                    species identification, and ecosystems using the provided document text."""
+                },
+                {
+                    "role": "user", 
+                    "content": f"{query}\n\nExtracted text:\n{extracted_text}"
+                }
             ],
             max_tokens=500,
         )

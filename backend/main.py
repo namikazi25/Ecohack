@@ -17,6 +17,7 @@ chat_history = []  # Persistent Chat History
 @app.post("/query/")
 async def process_query(
     query: str = Form(...),
+    pdf_context: str = Form(None),           # <--- NEW PARAM
     file: UploadFile = File(None)
 ):
     """Handles user input and maintains chat history."""
@@ -29,6 +30,10 @@ async def process_query(
     if file:
         file_content = await file.read()
         file_type = file.content_type
+    
+    # Use PDF context if available
+    if pdf_context and not file:
+        query = f"{query}\nPDF Context: {pdf_context}"
 
     attempt = 0
     while attempt < MAX_RETRIES:
@@ -41,6 +46,8 @@ async def process_query(
         if "error" not in evaluation:
             # **Step 3: Execute**
             result = executor.execute(evaluation, chat_history)
+            if file and "pdf" in file_type:
+                result["pdf_context"] = evaluation.get("extracted_text", "")
             chat_history.append({"role": "assistant", "content": result["response"]})  # Store response
             return result  # Successfully executed
 
