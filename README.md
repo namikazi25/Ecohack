@@ -1,4 +1,4 @@
-![EcoBot Logo](assets\screenshot-ecobot.jpg)
+![EcoBot Logo](screenshot-ecobot.jpeg)
 
 
 # 🌿 EcoBot: AI-Powered Ecological Assistant with Agentic Workflow
