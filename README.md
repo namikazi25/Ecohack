@@ -1,4 +1,4 @@
-![EcoBot Logo](screenshot.jpeg)
+![EcoBot Logo](assets\screenshot-ecobot.jpg)
 
 
 # 🌱 EcoBot: AI-Powered Ecological Assistant
