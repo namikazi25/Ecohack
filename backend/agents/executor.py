@@ -12,60 +12,76 @@ from backend.tools.wiki_tool import search_wikipedia, fetch_full_page
 class ExecutingAgent:
     """Executes the validated plan and retrieves results."""
 
-    def execute(self, plan, history=None):  # ✅ Added history as an optional parameter
-        """Executes the validated plan based on the tool selection while keeping track of history."""
-        history = history or []  # Initialize if None
+    def execute(self, plan, history=None):
+        """Executes the validated plan based on the tool selection"""
+        history = history or []
         response = {"response": "", "sources": []}
-        
-        tool = plan.get("tool")
-        data = plan.get("data")
-        file_type = plan.get("file_type", None)  # ✅ Extract file_type if available
 
-        # Initialize default response
-        response = {
-            "response": "❌ Unable to process request",
-            "sources": []
+        try:
+            tool = plan.get("tool")
+            data = plan.get("data")
+            file_type = plan.get("file_type")
+
+            if tool == "gpt":
+                response["response"] = process_with_gpt4o(data)
+            
+            elif tool == "image":
+                if file_type:
+                    response["response"] = process_image_with_gpt4o(data, file_type)
+                else:
+                    response["response"] = "❌ Missing file type for image processing"
+            
+            elif tool == "pdf":
+                extracted_text = data.get("extracted_text", "")
+                user_query = data.get("user_query", "Summarize this document.")
+                response["response"] = process_pdf_with_gpt4o(extracted_text, user_query)
+            
+            elif tool == "wiki":
+                result = search_wikipedia(data)
+                if "error" in result:
+                    return self.fallback_response(data, result)
+                response["response"] = self.format_wiki_summary(result)
+                response["sources"] = [result["url"]]
+            
+            elif tool == "wiki_full":
+                result = fetch_full_page(data)
+                if "error" in result:
+                    return self.fallback_response(data, result)
+                response["response"] = self.format_full_wiki(result)
+                response["sources"] = [result["url"]]
+            
+            else:
+                response["response"] = "❌ Unknown tool selected"
+
+        except Exception as e:
+            response["response"] = f"⚠️ Execution Error: {str(e)}"
+
+        # Update chat history
+        history.append({"role": "assistant", "content": response["response"]})
+        
+        return {
+            "response": response["response"],
+            "sources": response.get("sources", []),
+            "history": history
         }
 
-        # **Execution Strategy**
-        if tool == "gpt":
-            response = process_with_gpt4o(data)  # Calls GPT for general queries
-        elif tool == "image":
-            if file_type:  # ✅ Ensure we pass file_type for images
-                response = process_image_with_gpt4o(data, file_type)
-            else:
-                return {"error": "File type missing for image processing"}
-        elif tool == "pdf":
-            extracted_text = data.get("extracted_text")
-            user_query = data.get("user_query", "Summarize this document.")
-            response = process_pdf_with_gpt4o(extracted_text, user_query)
+    @staticmethod
+    def format_wiki_summary(result: dict) -> str:
+        return f"""🌿 **{result['title']}**  
+{result['summary']}  
+📅 Last Updated: {result['last_updated'][:10]}  
+🔗 [Read More]({result['url']})"""
 
-        elif tool == "wiki":
-                result = search_wikipedia(data)
-                if result:
-                    response["response"] = f"🌐 **{result['title']}**\n{result['summary']}"
-                    response["sources"] = [result['url']]
-                else:
-                    response["response"] = "❌ No relevant Wikipedia articles found"
+    @staticmethod
+    def format_full_wiki(result: dict) -> str:
+        return f"""📖 **Full Article**: {result['url']}  
+{result['content'][:2500]}...  
+**Sections**: {', '.join(result['sections'][:5])}"""
 
-        # Add new execution branch
-        elif tool == "wiki_full":
-            if not data.isdigit():
-                return {"error": "Invalid page ID format"}
-            full_content = fetch_full_page(int(data))
-            if full_content:
-                return {
-                    "response": f"📚 Full Wikipedia Content:\n{full_content[:3000]}...",
-                    "sources": [f"Wikipedia Page ID: {data}"]
-                }
-            return {"response": "❌ Could not retrieve full article"}
-            
-        
-
-        # **Update Chat History**
-        history.append({"role": "assistant", "content": response})
-        
-        return {"response": response, "history": history}  # ✅ Include history in response
-
-
-
+    @staticmethod
+    def fallback_response(query: str, error: dict) -> dict:
+        return {
+            "response": f"❌ Wikipedia Error: {error.get('error', 'Unknown error')}. GPT Response:\n{process_with_gpt4o(query)}",
+            "sources": [],
+            "history": []
+        }
