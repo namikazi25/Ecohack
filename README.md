@@ -1,150 +1,151 @@
 ![EcoBot Logo](screenshot.jpeg)
 
 
-# 🌱 EcoBot: AI-Powered Ecological Assistant
+# 🌿 EcoBot: AI-Powered Ecological Assistant with Agentic Workflow
 
-EcoBot is a chatbot built to empower ecological exploration and species identification. It leverages **GPT-4o Mini** for intelligent responses, supports **chat history persistence**, and can **analyze images and PDFs** to provide insights into biodiversity, species traits, and ecological questions.
+EcoBot is an intelligent ecological assistant that combines **multi-agent architecture** with **domain-specific tools** to provide scientifically accurate responses. Leveraging GPT-4o Mini and a sophisticated agentic workflow, it offers robust species identification, ecological analysis, and research paper processing capabilities.
 
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Streamlit Frontend**: A simple and intuitive chatbot interface.
-- **FastAPI Backend**: Receives requests, processes files, and interacts with GPT-4o Mini.
-- **File Uploads**: Supports image (JPEG, PNG) and PDF uploads for analysis.
-- **Chat History**: Maintains context across conversations.
-- **BioTrove-CLIP Model**: Zero-shot image classification for species identification.
+- **Agentic Workflow Architecture** (Planner → Evaluator → Executor)
+- **Multi-Modal Analysis**: Images, PDFs, and text queries
+- **Scientific Validation**: Wikipedia integration for taxonomic verification
+- **Context-Aware Processing**: Maintains conversation context across sessions
+- **BioTrove-CLIP Integration**: Specialized biological image classification
+
+---
+
+## 🧠 Architecture: Agentic Workflow
+
+EcoBot implements a three-stage agentic pipeline to ensure accurate and reliable responses:
+
+```mermaid
+graph TD
+    A[User Input] --> B(Planning Agent)
+    B --> C{Requires Wikipedia?}
+    C -->|Yes| D[Wikipedia Tools]
+    C -->|No| E{File Type?}
+    E -->|Image| F[GPT4o-mini]
+    F --> H[Evaluating Agent]
+    E -->|PDF| G[PDF Processor]
+    G --> H[Evaluating Agent]
+    H --> B(Planning Agent)
+    E -->|Text| H[Evaluating Agent]
+    H --> I[Executing Agent]
+    I --> J[Response Generation]
+```
+
+### Core Components
+
+1. **Planning Agent** (`planner.py`)
+   - Analyzes user intent using GPT-4o Mini
+   - Selects appropriate tools (Wikipedia/Image/PDF/GPT)
+   - Generates initial execution plan
+
+2. **Evaluating Agent** (`evaluator.py`)
+   - Validates tool selection against domain rules
+   - Checks for recent duplicate queries
+   - Approves or revises execution plans
+
+3. **Executing Agent** (`executor.py`)
+   - Orchestrates tool-specific operations:
+     - `wiki_tool.py`: Wikipedia API integration
+     - `image_tools.py`: BioTrove-CLIP + GPT-4o vision
+     - `pdf_tools.py`: Research paper analysis
+   - Maintains conversation context
+   - Formats final response with sources
 
 ---
 
 ## 📂 Directory Structure
 
-```bash
-namikazi25-ecohack/
-├── README.md              # Project documentation
-├── app.py                 # Streamlit app (front-end)
-├── requirements.txt       # Python dependencies
-├── assests/
-│   └── biotrove-test.avif # Sample asset
-├── backend/
-│   ├── gpt_handler.py     # GPT-4o Mini integration
-│   ├── image_classifier.py# BioTrove-CLIP classification
-│   ├── main.py            # FastAPI server
-│   └── __pycache__/
-├── tests/
-│   ├── test_image_classifier.py
-│   └── __pycache__/
-└── .streamlit/
-    └── config.toml        # Streamlit configuration
 ```
-
-1. **`app.py`**  
-   The Streamlit application that provides the chatbot UI.  
-2. **`requirements.txt`**  
-   Includes all Python packages needed to run EcoBot.  
-3. **`backend/`**  
-   - **`main.py`**: Defines the FastAPI endpoints and orchestrates GPT-4o interactions.  
-   - **`gpt_handler.py`**: Core logic for handling queries, PDFs, images, and GPT-4o queries.  
-   - **`image_classifier.py`**: Uses BioTrove-CLIP for image-based species classification.  
-4. **`tests/`**  
-   Contains unit tests for the `image_classifier.py`.  
-5. **`.streamlit/`**  
-   Contains Streamlit configuration files.
+namikazi25-ecobot/
+├── app.py                 # Streamlit frontend
+├── backend/
+│   ├── agents/            # Core decision-making components
+│   │   ├── evaluator.py   # Plan validation
+│   │   ├── executor.py    # Tool execution
+│   │   └── planner.py     # Initial strategy
+│   ├── tools/             # Domain-specific capabilities
+│   │   ├── image_tools.py # Vision processing
+│   │   ├── pdf_tools.py   # Document analysis
+│   │   └── wiki_tool.py   # Fact verification
+│   └── utils/             # Shared functionality
+└── tests/                 # Comprehensive test suite
+```
 
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Installation & Usage
 
-1. **Clone the Repository**
+### Prerequisites
+- Python 3.9+
+- OpenAI API key
 
+### Quick Start
+
+1. **Clone repository**
    ```bash
-   git clone https://github.com/namikazi25/Ecobot.git
+   git clone https://github.com/namikazi25/ecobot.git
    cd ecobot
    ```
 
-2. **Create a Virtual Environment**
-
-   ```bash
-   python -m venv venv
-   # macOS/Linux
-   source venv/bin/activate
-   # Windows
-   venv\Scripts\activate
-   ```
-
-3. **Install Dependencies**
-
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Set Environment Variables**
-
-   Create a `.env` file in the project root and add your OpenAI API key:
-
+3. **Configure environment**
    ```bash
-   OPENAI_API_KEY=your-openai-api-key
+   echo "OPENAI_API_KEY=your_key_here" > .env
    ```
 
----
-
-## ▶️ Usage
-
-1. **Start the FastAPI Backend**
-
+4. **Launch system**
    ```bash
-   cd backend
-   uvicorn main:app --reload
-   ```
-
-   The backend will be accessible at `http://127.0.0.1:8000`.
-
-2. **Run the Streamlit Frontend**
-
-   In a new terminal, navigate to the project root and run:
-
-   ```bash
+   # Start backend
+   cd backend && uvicorn main:app --reload
+   
+   # In new terminal
    streamlit run app.py
    ```
 
-   Open the local URL provided in your terminal to access the EcoBot interface.
+
+## 🌐 Live Demo Access
+
+Experience EcoBot without local installation:  
+[https://ecobotv0.streamlit.app/](https://ecobotv0.streamlit.app/)
+
+Demo features:
+- Real-time species identification
+- PDF research paper analysis
+- Conservation status lookup
+- Habitat information retrieval
 
 ---
 
-## 🤖 How It Works
+## 📚 Knowledge Base
 
-1. **User Input**  
-   - You can upload an image or PDF (optional).
-   - Then type your ecological question or request in the chat input.
-
-2. **Request Handling**  
-   - The Streamlit frontend sends your message (and any file) to the FastAPI backend.
-
-3. **GPT-4o Mini Integration**  
-   - The backend calls GPT-4o Mini with the current query, any relevant chat history, and the file content.
-
-4. **Response**  
-   - GPT-4o Mini returns a detailed answer, which is displayed in the chat UI.
-   - Any species classifications are assisted by the BioTrove-CLIP model for image analysis.
+EcoBot prioritizes scientific accuracy through:
+- **GPT4o-mini Model**: Biological image classification
+- **Wikipedia Verification**: Taxonomic data validation
+- **Research Paper Analysis**: PDF text extraction + GPT synthesis
 
 ---
-
-## 📌 Troubleshooting
-
-- **Field Required Error**  
-  Ensure `history` is sent as `json.dumps(history)` when making requests to the backend.
-
-- **Chatbot Forgets Messages**  
-  Make sure `st.session_state.messages` is properly maintained in `app.py`.
-
-- **File Uploads Not Working**  
-  Verify that files are being sent via `files=files` in your `requests.post()` to the FastAPI endpoint.
-
-- **API Key Missing**  
-  Make sure your `.env` file contains `OPENAI_API_KEY`.
-
+🤝 How to Contribute
+We welcome contributions from developers, ecologists, and AI enthusiasts! Here's how you can help:
+- Report Issues: Found a bug? Open an issue
+- Suggest Enhancements: Have an idea? Start a discussion
+- Submit PRs:
+- Improve vision processing in image_tools.py
+- Enhance PDF analysis in pdf_tools.py
+- Expand ecological knowledge base
+- First-time contributors are especially welcome!
+---
 
 <p align="center">
-  <strong>Thank you for using EcoBot! Together, let's explore and protect our planet's biodiversity. 🌏</strong>
+  "Empowering ecological exploration through intelligent agentic workflows" 🌍
 </p>
