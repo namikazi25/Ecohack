@@ -13,6 +13,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "last_uploaded_file" not in st.session_state:
     st.session_state.last_uploaded_file = None  # Store the last uploaded file name
+if "pdf_context" not in st.session_state:
+    st.session_state.pdf_context = None  # Store latest PDF content
 
 # Display chat history (Messages appear sequentially)
 for message in st.session_state.messages:
@@ -50,12 +52,19 @@ if user_input:
 
     # Prepare request payload
     history = json.dumps([{"role": msg["role"], "content": msg["content"]} for msg in st.session_state.messages])
+    
+     # data = {"query": user_input, "history": history}
+    data = {
+    "query": user_input if user_input else "Analyze the uploaded file.",
+    "history": history,
+    "pdf_context": st.session_state.pdf_context  # Send current PDF context
+}
+    
     files = None
     if uploaded_file:
         files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
 
-    # data = {"query": user_input, "history": history}
-    data = {"query": user_input if user_input else "Analyze the uploaded file.", "history": history}
+   
 
     # Send request to FastAPI backend
     try:

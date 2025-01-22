@@ -14,13 +14,10 @@ def extract_text_from_pdf(file_content: bytes) -> str:
     except Exception as e:
         return f"❌ Error extracting text from PDF: {str(e)}"
 
-def process_pdf_with_gpt4o(file_content: bytes, query: str = "Summarize this document.") -> str:
-    """Sends extracted PDF text to GPT-4o for processing."""
-    extracted_text = extract_text_from_pdf(file_content)
-
-    if "❌" in extracted_text:
-        return extracted_text  # Return the extraction error directly
-
+def process_pdf_with_gpt4o(extracted_text: str, query: str) -> str:
+    """Sends extracted PDF text to GPT-4o for processing using the user's query."""
+    if not extracted_text:
+        return "No text extracted from the PDF."
     try:
         response = client.chat.completions.create(
             model="gpt-4o",

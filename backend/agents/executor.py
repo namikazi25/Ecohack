@@ -29,7 +29,9 @@ class ExecutingAgent:
             else:
                 return {"error": "File type missing for image processing"}
         elif tool == "pdf":
-            response = process_pdf_with_gpt4o(data)  # Extracts text before answering
+            extracted_text = data.get("extracted_text")
+            user_query = data.get("user_query", "Summarize this document.")
+            response = process_pdf_with_gpt4o(extracted_text, user_query)
         elif tool == "wiki":
             response = fetch_wikipedia_summary(data)  # Wikipedia lookup
         else:
