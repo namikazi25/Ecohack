@@ -114,18 +114,6 @@ namikazi25-ecobot/
    ```
 
 
-## 🌐 Live Demo Access
-
-Experience EcoBot without local installation:  
-[https://ecobotv0.streamlit.app/](https://ecobotv0.streamlit.app/)
-
-Demo features:
-- Real-time species identification
-- PDF research paper analysis
-- Conservation status lookup
-- Habitat information retrieval
-
----
 
 ## 📚 Knowledge Base
 
