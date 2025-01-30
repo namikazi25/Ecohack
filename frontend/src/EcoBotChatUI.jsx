@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import {
   Menu,
   X,
@@ -8,22 +9,71 @@ import {
   User,
   Upload,
   Send,
-  // We'll add a Leaf icon for an eco look
   Leaf
 } from 'lucide-react';
 
 export default function EcoBotChatUI() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [input, setInput] = useState('');
+  const [chatHistory, setChatHistory] = useState([]); // store messages as { role: 'user' | 'assistant', content: string }
 
   // Toggle sidebar open/close
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
-  // Placeholder function to handle sending a message
-  const handleSendMessage = () => {
-    // Integrate with your backend
-    console.log('User message:', input);
-    setInput('');
+  // Send message to backend
+  const handleSendMessage = async () => {
+    if (!input.trim()) return;
+
+    // 1) Add user message to chat
+    const userMessage = { role: 'user', content: input };
+    setChatHistory((prev) => [...prev, userMessage]);
+
+    try {
+      // 2) Prepare form data
+      const formData = new FormData();
+      formData.append('query', input);
+      // formData.append('pdf_context', ''); // Optional if you have a PDF context
+      // If you have a file, you can do:
+      // formData.append('file', selectedFile);
+
+      // 3) Call your FastAPI endpoint
+      const response = await axios.post('http://127.0.0.1:8000/query/', formData);
+      console.log('Response from backend:', response.data);
+
+      // 4) Extract backend response and add to chat
+      const botResponse = response.data?.response || 'No response received.';
+      const assistantMessage = { role: 'assistant', content: botResponse };
+      setChatHistory((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error calling backend:', error);
+      // Optionally add an error message to chat
+      const assistantMessage = { role: 'assistant', content: `Error: ${error.message}` };
+      setChatHistory((prev) => [...prev, assistantMessage]);
+    } finally {
+      setInput('');
+    }
+  };
+
+  // Simple renderer for chat messages
+  const renderMessages = () => {
+    return chatHistory.map((msg, i) => {
+      const isUser = msg.role === 'user';
+      return (
+        <div
+          key={i}
+          className={`w-full my-2 flex ${isUser ? 'justify-end' : 'justify-start'}`}
+        >
+          <div
+            className={`
+              max-w-[60%] rounded-xl px-4 py-2
+              ${isUser ? 'bg-green-600 text-white' : 'bg-gray-200 text-black'}
+            `}
+          >
+            {msg.content}
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
@@ -79,7 +129,6 @@ export default function EcoBotChatUI() {
       <div className="flex-1 flex flex-col">
         {/* Top Bar (no model/online status) */}
         <div className="flex items-center h-16 px-4 border-b border-[#2B372E]">
-          {/* EcoBot Title */}
           <div className="flex items-center">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600 text-3xl font-bold tracking-wide">
               EcoBot
@@ -87,11 +136,9 @@ export default function EcoBotChatUI() {
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-          <p className="text-gray-400">
-            Chat messages will appear here.
-          </p>
+        {/* Content Area: Chat display */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {renderMessages()}
         </div>
 
         {/* Input Box */}
@@ -110,6 +157,7 @@ export default function EcoBotChatUI() {
               }}
             />
             <div className="flex items-center space-x-3 ml-2 text-gray-400">
+              {/* (Optional) if you want file attachments */}
               <Upload className="cursor-pointer hover:text-green-400" />
               <button onClick={handleSendMessage}>
                 <Send className="text-gray-400 hover:text-green-400" />
