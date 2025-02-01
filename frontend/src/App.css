@@ -1,3 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.eco-main-bg {
+  @apply bg-[#16251D];
+}
+
+.eco-sidebar-bg {
+  @apply bg-[#1F2C23];
+}
+
+.eco-input-bg {
+  @apply bg-[#2B372E];
+}
+
+.eco-border-color {
+  @apply border-[#2B372E];
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +59,12 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.eco-sidebar {
+  @apply bg-[#1F2C23];
+}
+
+.main-panel {
+  @apply bg-[#16251D];
 }
