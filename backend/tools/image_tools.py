@@ -10,27 +10,31 @@ def encode_image(file_content: bytes, file_type: str) -> str:
     except Exception as e:
         return None
 
-def process_image_with_gpt4o(file_content: bytes, file_type: str, query="Identify this species.") -> str:
-    """Sends an image to GPT-4o for species identification."""
-    image_data_url = encode_image(file_content, file_type)
+def process_image_with_gpt4o(file_content, file_type: str, query="Identify this species.") -> str:
+    # If file_content is already a data URI string, use it directly.
+    if isinstance(file_content, str) and file_content.startswith("data:image/"):
+         image_data_url = file_content
+    else:
+         image_data_url = encode_image(file_content, file_type)
 
     if not image_data_url:
-        return "❌ Error: Image encoding failed."
+         return "❌ Error: Image encoding failed."
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": query},
-                        {"type": "image_url", "image_url": {"url": image_data_url, "detail": "high"}},
-                    ],
-                }
-            ],
-            max_tokens=500,
-        )
-        return response.choices[0].message.content
+         response = client.chat.completions.create(
+             model="gpt-4o",
+             messages=[
+                 {
+                     "role": "user",
+                     "content": [
+                         {"type": "text", "text": query},
+                         {"type": "image_url", "image_url": {"url": image_data_url, "detail": "high"}},
+                     ],
+                 }
+             ],
+             max_tokens=500,
+         )
+         return response.choices[0].message.content
     except Exception as e:
-        return f"❌ Error processing image: {str(e)}"
+         return f"❌ Error processing image: {str(e)}"
+
